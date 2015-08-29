@@ -9,6 +9,18 @@ def generate_csrf_token():
         session['_csrf_token'] = utils.random_string()
     return session['_csrf_token']
 
+
+#Filter to create curly braces
+def curly(value):
+    #Handle value as string  {{'foo'|curly}}
+    if(isinstance(value,str)):
+        return_value = value
+    #Handle value directly. {{foo|curly}}
+    else:
+        return_value = value._undefined_name
+    return "{{" + return_value + "}}"
+
+
 def jinja2_factory(app):
     j = jinja2.Jinja2(app)
     j.environment.filters.update({
@@ -20,6 +32,7 @@ def jinja2_factory(app):
         'csrf_token': generate_csrf_token,
         'uri_for': webapp2.uri_for,
         'getattr': getattr,
+        'curly': curly
     })
     j.environment.tests.update({
         # Set test.
