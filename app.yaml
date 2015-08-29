@@ -60,6 +60,10 @@ handlers:
   mime_type: text/css
   static_dir: bp_includes/static/css
 
+- url: /polymer/dist
+  mime_type: text/css
+  static_dir: bp_content/themes/default/static/polymer/dist
+
 - url: /boilerplate/js
   mime_type: text/javascript
   static_dir: bp_includes/static/js

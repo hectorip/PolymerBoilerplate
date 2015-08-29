@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="/{{ theme }}/css/style.css">
     {% block mediaCSS %}{% endblock %}
 
+    <script src="/polymer/dist/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="/polymer/dist/elements/elements.vulcanized.html">
+
     {{ google_analytics_code }}
     <!-- All JavaScript at the bottom, except this Modernizr build.
        Modernizr enables HTML5 elements & feature detects for optimal performance. -->
@@ -36,160 +39,112 @@
     <![endif]-->
 
 <div id="page">
-    {% block navbar %}
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="glyphicon-chevron-down glyphicon"></span>
-                </button>
-                <a class="navbar-brand" href="/">{{ app_name }}</a>
-            </div>
-            <div class="navbar-collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="https://github.com/coto/gae-boilerplate" target="_blank">
-                        <span class="glyphicon-inbox glyphicon"></span> {% trans %}Source Code{% endtrans %}</a>
-                    </li>
-                    {% if locale_iso %}
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <span class="glyphicon-globe glyphicon"></span>
-                                {% trans %}Language{% endtrans %} : {{ locale_language }} <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                {% for l in locales %}
-                                    {% if locale_iso != l %}
-                                        <li><a href="{{ path_for_language }}&hl={{ l }}">{{ locales[l] }}</a></li>
-                                    {% endif %}
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endif %}
-                    {% if user_id %}
-                        <li class="divider-vertical"></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">@{{ username }}<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ uri_for("edit-profile") }}">{% trans %}Edit Profile{% endtrans %}</a></li>
-                                <li class="divider"></li>
-                                <li><a href="{{ logout_url }}">{% trans %}Logout{% endtrans %}</a></li>
-                            </ul>
-                        </li>
-                    {% elif path != "/" and path != "/login/" %}
-                        <li class="divider-vertical"></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                {% trans %}Login{% endtrans %} <b class="caret"></b>
-                            </a>
+<paper-drawer-panel id="paperDrawerPanel">
+      <div drawer>
 
-                            <div class="dropdown-menu well">
-                                <form id="form_login_user" action="{{ uri_for("login") }}" method="post"
-                                      class="auth-at-dropdown">
-                                    <fieldset>
-                                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <!-- Drawer Toolbar -->
+        <paper-toolbar id="drawerToolbar">
+          <span class="paper-font-title">Menu</span>
+        </paper-toolbar>
 
-                                        <div class="form-group">
-                                            <label class="control-label" for="l_username">
-                                                {% trans %}Username or Email{% endtrans %}:
-                                            </label>
-                                            <div class="controls">
-                                                <input class="input-xlarge focused required" id="l_username"
-                                                       name="username" type="text" value="">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="control-label" for="l_password">
-                                                {% trans %}Password{% endtrans %}:
-                                            </label>
-                                            <div class="controls">
-                                                <input class="input-xlarge focused required" id="l_password"
-                                                       name="password" type="password" value="">
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label class="checkbox col-md-7">
-                                                <input type="checkbox" name="remember_me" id="remember_me"
-                                                       value="on">
-                                                {% trans %}Remember me?{% endtrans %}
-                                            </label>
+        <!-- Drawer Content -->
+          <paper-menu class="list" attr-for-selected="data-route" selected="{{route}}" on-iron-select="onMenuSelect">
+              <a data-route="home" href="/">
+                <iron-icon icon="home"></iron-icon>
+                <span>Home</span>
+              </a>
 
-                                            <div class="col-md-5">
-                                                <button type="submit" class="btn btn-primary btn-small btn-login">
-                                                    {% trans %}Login{% endtrans %}</button>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <a href="{{ uri_for("password-reset") }}">
-                                                {% trans %}Forgot your password?{% endtrans %}</a>
-                                        </div>
-                                        {{ macros.federated_login(provider_info, provider_uris, enable_federated_login) }}
-                                    </fieldset>
-                                </form>
-                            </div>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-            <!-- /.nav-collapse -->
+              <a data-route="users" href="/users">
+                <iron-icon icon="info"></iron-icon>
+                <span>Users</span>
+              </a>
 
-            </div>
-            <!-- /navbar-inner -->
-        </div><!-- /navbar -->
-    {% endblock %}
+              <a data-route="contact" href="/contact">
+                <iron-icon icon="mail"></iron-icon>
+                <span>Contact</span>
+              </a>
+          </paper-menu>
+      </div>
+      <paper-header-panel main mode="waterfall-tall">
 
-    <div id="content" class="container xled">
-        {% block header %}
-            <header class="navbar" id="overview">
-                {% block header_title_lead %}
-                    <h1>{% block header_title %}{{ app_name }}{% endblock %}</h1>
-                    <p class="lead">
-                        {% trans %}Congratulations on your Google App Engine Boilerplate powered page.{% endtrans %}
-                        <br><a href="http://github.com/coto/gae-boilerplate/blob/master/README.md" target="_blank">
-                        {% trans %}Learn why this Boilerplate Rocks{% endtrans %}</a> {% trans %}or just{% endtrans %}
-                        <a href="http://github.com/coto/gae-boilerplate/" target="_blank">
-                            {% trans %}download the Source Code{% endtrans %}</a>
-                        {% trans %}to help you to create your application.{% endtrans %}
-                    </p>
-                {% endblock %}
-                {% block subnavbar %}
-                    <div class="subnav">
-                        <ul>
-                            <li{% if path == uri_for("contact") %} class="active"{% endif %}>
-                                <a href="{{ uri_for("contact") }}">{% trans %}Contact{% endtrans %}</a>
-                            </li>
-                            {% if not user_id %}
-                                <li{% if path == uri_for("register") %} class="active"{% endif %}>
-                                    <a href="{{ uri_for("register") }}">{% trans %}Sign Up{% endtrans %}</a>
-                                </li>
-                                <li{% if path == uri_for("password-reset") %} class="active"{% endif %}>
-                                    <a href="{{ uri_for("password-reset") }}">{% trans %}Forgot your password?{% endtrans %}</a>
-                                </li>
-                            {% endif %}
-                        </ul>
+        <!-- Main Toolbar -->
+        <paper-toolbar id="mainToolbar">
+          <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
+          <span class="flex"></span>
+
+          <!-- Toolbar icons -->
+          <paper-icon-button icon="refresh"></paper-icon-button>
+          <paper-icon-button icon="search"></paper-icon-button>
+
+          <!-- Application name -->
+          <div class="middle paper-font-display2 app-name">{{ app_name }}</div>
+
+          <!-- Application sub title -->
+          <div class="bottom title"></div>
+
+        </paper-toolbar>
+
+        <!-- Main Content -->
+        <div class="content">
+
+                    <div id="content" class="container xled">
+                        {% block header %}
+                            <header class="navbar" id="overview">
+                                {% block header_title_lead %}
+                                    <h1>{% block header_title %}{{ app_name }}{% endblock %}</h1>
+                                    <p class="lead">
+                                        {% trans %}Congratulations on your Google App Engine Boilerplate powered page.{% endtrans %}
+                                        <br><a href="http://github.com/coto/gae-boilerplate/blob/master/README.md" target="_blank">
+                                        {% trans %}Learn why this Boilerplate Rocks{% endtrans %}</a> {% trans %}or just{% endtrans %}
+                                        <a href="http://github.com/coto/gae-boilerplate/" target="_blank">
+                                            {% trans %}download the Source Code{% endtrans %}</a>
+                                        {% trans %}to help you to create your application.{% endtrans %}
+                                    </p>
+                                {% endblock %}
+                                {% block subnavbar %}
+                                    <div class="subnav">
+                                        <ul>
+                                            <li{% if path == uri_for("contact") %} class="active"{% endif %}>
+                                                <a href="{{ uri_for("contact") }}">{% trans %}Contact{% endtrans %}</a>
+                                            </li>
+                                            {% if not user_id %}
+                                                <li{% if path == uri_for("register") %} class="active"{% endif %}>
+                                                    <a href="{{ uri_for("register") }}">{% trans %}Sign Up{% endtrans %}</a>
+                                                </li>
+                                                <li{% if path == uri_for("password-reset") %} class="active"{% endif %}>
+                                                    <a href="{{ uri_for("password-reset") }}">{% trans %}Forgot your password?{% endtrans %}</a>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                {% endblock %}
+                            </header>
+                        {% endblock %}
+
+                        {% if messages|safe %}
+                            {% for message in messages %}
+                                <p class="alert alert-{{ message[1]|safe }}">
+                                    <a class="close" data-dismiss="alert">×</a>
+                                    {{ message[0]|safe }}
+                                </p>
+                            {% endfor %}
+                        {% endif %}
+                        {% block content %}{% endblock %}
+
+                        {% block footer %}
+                            <footer>
+                                {% trans %}Google App Engine Boilerplate is released under the{% endtrans %}
+                                <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">LGPL</a>
+                            </footer>
+                        {% endblock %}
                     </div>
-                {% endblock %}
-            </header>
-        {% endblock %}
-
-        {% if messages|safe %}
-            {% for message in messages %}
-                <p class="alert alert-{{ message[1]|safe }}">
-                    <a class="close" data-dismiss="alert">×</a>
-                    {{ message[0]|safe }}
-                </p>
-            {% endfor %}
-        {% endif %}
-        {% block content %}{% endblock %}
-
-        {% block footer %}
-            <footer>
-                {% trans %}Google App Engine Boilerplate is released under the{% endtrans %}
-                <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">LGPL</a>
-            </footer>
-        {% endblock %}
-    </div>
-    <!-- /content -->
-</div>
-<!-- /page -->
+                    <!-- /content -->
+                </div>
+                <!-- /page -->
+        </div>
+      </paper-header-panel>
+    </paper-drawer-panel>
+    
 
 <!-- JavaScript at the bottom for fast page loading -->
 <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
