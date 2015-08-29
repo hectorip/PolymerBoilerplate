@@ -227,14 +227,17 @@ gulp.task('serve:dist', ['default'], function () {
     server: 'dist'
   });
 });
-
+gulp.task('copy_to_theme', function () {
+  return gulp.src(['dist/**'])
+    .pipe(gulp.dest('../bp_content/themes/default/static/polymer/dist'));
+})
 // Build Production Files, the Default Task
 gulp.task('default', ['clean'], function (cb) {
   runSequence(
     ['copy', 'styles'],
     'elements',
     ['jshint', 'images', 'fonts', 'html'],
-    'vulcanize', 'precache',
+    'vulcanize', 'precache', 'copy_to_theme',
     cb);
 });
 

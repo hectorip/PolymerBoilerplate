@@ -44,25 +44,28 @@
 
         <!-- Drawer Toolbar -->
         <paper-toolbar id="drawerToolbar">
-          <span class="paper-font-title">Menu</span>
+          <span class="paper-font-title">{% trans %}Menu{% endtrans %}</span>
         </paper-toolbar>
 
         <!-- Drawer Content -->
-          <paper-menu class="list" attr-for-selected="data-route" selected="{{route}}" on-iron-select="onMenuSelect">
-              <a data-route="home" href="/">
-                <iron-icon icon="home"></iron-icon>
-                <span>Home</span>
-              </a>
+          <paper-menu class="list" attr-for-selected="data-route" selected="{{path}}" >
+              {% block subnavbar %}
+                    <a data-route="{{ uri_for("contact") }}" href="{{ uri_for("contact") }}">
+                      <iron-icon icon="mail"></iron-icon>
+                      <span>{% trans %}Contact{% endtrans %}</span>
+                    </a>
+                    {% if not user_id %}
+                    <a data-route="{{ uri_for("register") }}" href="{{ uri_for("register") }}">
+                      <iron-icon icon="info"></iron-icon>
+                      <span>{% trans %}Sign Up{% endtrans %}</span>
+                    </a>
 
-              <a data-route="users" href="/users">
-                <iron-icon icon="info"></iron-icon>
-                <span>Users</span>
-              </a>
-
-              <a data-route="contact" href="/contact">
-                <iron-icon icon="mail"></iron-icon>
-                <span>Contact</span>
-              </a>
+                    <a data-route="{{ uri_for("password-reset") }}" href="{{ uri_for("password-reset") }}">
+                      <iron-icon icon="mail"></iron-icon>
+                      <span>{% trans %}Forgot your password?{% endtrans %}</span>
+                    </a>
+                    {% endif %}
+              {% endblock %}
           </paper-menu>
       </div>
       <paper-header-panel main mode="waterfall-tall">
@@ -101,23 +104,7 @@
                                         {% trans %}to help you to create your application.{% endtrans %}
                                     </p>
                                 {% endblock %}
-                                {% block subnavbar %}
-                                    <div class="subnav">
-                                        <ul>
-                                            <li{% if path == uri_for("contact") %} class="active"{% endif %}>
-                                                <a href="{{ uri_for("contact") }}">{% trans %}Contact{% endtrans %}</a>
-                                            </li>
-                                            {% if not user_id %}
-                                                <li{% if path == uri_for("register") %} class="active"{% endif %}>
-                                                    <a href="{{ uri_for("register") }}">{% trans %}Sign Up{% endtrans %}</a>
-                                                </li>
-                                                <li{% if path == uri_for("password-reset") %} class="active"{% endif %}>
-                                                    <a href="{{ uri_for("password-reset") }}">{% trans %}Forgot your password?{% endtrans %}</a>
-                                                </li>
-                                            {% endif %}
-                                        </ul>
-                                    </div>
-                                {% endblock %}
+                                
                             </header>
                         {% endblock %}
 
